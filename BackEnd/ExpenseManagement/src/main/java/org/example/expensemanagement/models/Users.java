@@ -19,13 +19,16 @@ public class Users {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(nullable = false, unique = true)
-  private UUID id;
+  private String id;
 
   @Column(nullable = false)
   private String fullName;
 
   @Column(nullable = false)
   private String email;
+
+  @Column(nullable = false)
+  private String phone;
 
   @Column(nullable = false)
   private String password;
@@ -38,4 +41,11 @@ public class Users {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Category> categories = new ArrayList<>();
+
+  @PrePersist
+  public void generateId() {
+    if (this.id == null) {
+      this.id = UUID.randomUUID().toString();
+    }
+  }
 }
