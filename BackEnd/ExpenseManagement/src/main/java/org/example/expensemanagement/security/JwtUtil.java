@@ -23,10 +23,10 @@ public class JwtUtil {
     this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String generateAccessToken(String username, String id) {
+  public String generateAccessToken(String phone, String id) {
     return Jwts.builder()
             .subject("Expense Management")
-            .claim("username", username)
+            .claim("phone", phone)
             .claim("id", id)
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -35,10 +35,10 @@ public class JwtUtil {
             .compact();
   }
 
-  public String generateRefreshToken(String username, String id) {
+  public String generateRefreshToken(String phone, String id) {
     return Jwts.builder()
             .subject("Expense Management")
-            .claim("username", username)
+            .claim("phone", phone)
             .claim("id", id)
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
@@ -61,6 +61,6 @@ public class JwtUtil {
       throw new JwtException("Token không hợp lệ");
     }
 
-    return claims.get("username", String.class);
+    return claims.get("phone", String.class);
   }
 }

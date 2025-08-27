@@ -49,7 +49,7 @@ public class UserService {
         }
 
         // Create access token
-        String accessToken = jwtUtil.generateAccessToken(phone.getFullName(), phone.getId());
+        String accessToken = jwtUtil.generateAccessToken(phone.getPhone(), phone.getId());
 
         // Create refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(phone);
@@ -110,8 +110,8 @@ public class UserService {
         return new UserInfoResponse(null, "Access không được để trống!!!");
       }
 
-      String fullName = jwtUtil.validateTokenAndRetrieveSubject(accessToken);
-      Users user = userRepository.findByFullName(fullName);
+      String phone = jwtUtil.validateTokenAndRetrieveSubject(accessToken);
+      Users user = userRepository.findByPhone(phone);
       if(user == null) {
         return new UserInfoResponse(null, "Không tìm thấy thông tin người dùng!!!");
       }
