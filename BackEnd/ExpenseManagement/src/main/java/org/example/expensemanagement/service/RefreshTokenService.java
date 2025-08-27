@@ -4,8 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.expensemanagement.models.RefreshToken;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.RefreshTokenRepository;
-import org.example.expensemanagement.repository.UserRepository;
-import org.example.expensemanagement.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +18,6 @@ public class RefreshTokenService {
 
   @Autowired
   private RefreshTokenRepository refreshTokenRepository;
-
-  @Autowired
-  private UserRepository userRepository;
-
-  @Autowired
-  private JwtUtil jwtUtil;
 
   @Transactional
   public RefreshToken createRefreshToken(Users user) {

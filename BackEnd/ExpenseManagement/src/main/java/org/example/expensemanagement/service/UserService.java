@@ -1,17 +1,16 @@
 package org.example.expensemanagement.service;
 
 import jakarta.transaction.Transactional;
-import org.example.expensemanagement.dto.LoginRequest;
-import org.example.expensemanagement.dto.LoginResponse;
-import org.example.expensemanagement.dto.LogoutRequest;
-import org.example.expensemanagement.dto.LogoutResponse;
+import org.example.expensemanagement.dto.*;
 import org.example.expensemanagement.models.RefreshToken;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.UserRepository;
 import org.example.expensemanagement.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService {
@@ -101,6 +100,33 @@ public class UserService {
     }
     catch (Exception e) {
       return new LogoutResponse("Logout thất bại: " + e.getMessage());
+    }
+  }
+
+  public UserInfoResponse getInfo(UserInfoRequest userInfoRequest) {
+    try {
+      String accessToken = userInfoRequest.getAccessToken();
+      if(accessToken == null && accessToken.isEmpty()) {
+        return new UserInfoResponse(null, "Access không được để trống!!!");
+      }
+
+      String fullName = jwtUtil.validateTokenAndRetrieveSubject(accessToken);
+      Users user = userRepository.findByFullName(fullName);
+      if(user == null) {
+        return new UserInfoResponse(null, "Không tìm thấy thông tin người dùng!!!");
+      }
+
+      UserInfoResponse.AccountInfo accountInfo = new UserInfoResponse.AccountInfo(
+              user.getId(),
+              user.getFullName(),
+              user.getPhone(),
+              user.getEmail()
+      );
+      UserInfoResponse.DataInfo dataInfo = new UserInfoResponse.DataInfo(accountInfo);
+      return new UserInfoResponse(dataInfo, "Lấy thông tin người dùng thành công!!!");
+    }
+    catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token không hợp lệ");
     }
   }
 
