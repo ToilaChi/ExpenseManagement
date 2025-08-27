@@ -1,8 +1,6 @@
-package org.example.expensemanagement.dto;
+package org.example.expensemanagement.dto.user;
 
 import lombok.*;
-
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor

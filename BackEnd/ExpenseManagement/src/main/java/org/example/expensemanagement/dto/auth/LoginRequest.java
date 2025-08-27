@@ -1,4 +1,4 @@
-package org.example.expensemanagement.dto;
+package org.example.expensemanagement.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

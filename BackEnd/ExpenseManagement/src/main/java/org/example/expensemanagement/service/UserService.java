@@ -1,12 +1,18 @@
 package org.example.expensemanagement.service;
 
 import jakarta.transaction.Transactional;
-import org.example.expensemanagement.dto.*;
+import org.example.expensemanagement.dto.auth.LoginRequest;
+import org.example.expensemanagement.dto.auth.LoginResponse;
+import org.example.expensemanagement.dto.auth.LogoutRequest;
+import org.example.expensemanagement.dto.auth.LogoutResponse;
+import org.example.expensemanagement.dto.user.RegisterRequest;
+import org.example.expensemanagement.dto.user.RegisterResponse;
+import org.example.expensemanagement.dto.user.UserInfoRequest;
+import org.example.expensemanagement.dto.user.UserInfoResponse;
 import org.example.expensemanagement.models.RefreshToken;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.UserRepository;
 import org.example.expensemanagement.security.JwtUtil;
-import org.example.expensemanagement.utils.ApiResponse;
 import org.example.expensemanagement.utils.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +36,9 @@ public class UserService {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private CategoryService categoryService;
 
   public RegisterResponse register(RegisterRequest registerRequest) {
     try {
@@ -55,6 +64,8 @@ public class UserService {
       user.setFullName(registerRequest.getFullName());
 
       Users savedUser = userRepository.save(user);
+
+      categoryService.createDefaultCategories(savedUser);
 
       //Tạo access token
       String accessToken = jwtUtil.generateAccessToken(savedUser.getPhone(), savedUser.getId());

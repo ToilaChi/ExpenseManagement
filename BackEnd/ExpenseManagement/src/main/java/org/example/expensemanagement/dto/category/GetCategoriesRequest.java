@@ -1,4 +1,4 @@
-package org.example.expensemanagement.dto;
+package org.example.expensemanagement.dto.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogoutResponse {
-  private String message;
+public class GetCategoriesRequest {
+  private String accessToken;
 }

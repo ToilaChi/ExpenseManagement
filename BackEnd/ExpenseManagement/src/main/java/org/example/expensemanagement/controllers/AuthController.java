@@ -1,6 +1,8 @@
 package org.example.expensemanagement.controllers;
 
-import org.example.expensemanagement.dto.*;
+import org.example.expensemanagement.dto.auth.*;
+import org.example.expensemanagement.dto.user.RegisterRequest;
+import org.example.expensemanagement.dto.user.RegisterResponse;
 import org.example.expensemanagement.models.RefreshToken;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.security.JwtUtil;

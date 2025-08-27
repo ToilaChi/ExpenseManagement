@@ -1,7 +1,7 @@
 package org.example.expensemanagement.controllers;
 
-import org.example.expensemanagement.dto.UserInfoRequest;
-import org.example.expensemanagement.dto.UserInfoResponse;
+import org.example.expensemanagement.dto.user.UserInfoRequest;
+import org.example.expensemanagement.dto.user.UserInfoResponse;
 import org.example.expensemanagement.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
