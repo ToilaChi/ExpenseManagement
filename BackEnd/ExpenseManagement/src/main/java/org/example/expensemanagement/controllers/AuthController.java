@@ -27,6 +27,12 @@ public class AuthController {
   @Autowired
   private RefreshTokenService refreshTokenService;
 
+  @PostMapping("/register")
+  public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
+    RegisterResponse response = userService.register(registerRequest);
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
   @PostMapping("/login")
   public LoginResponse login(@RequestBody LoginRequest loginRequest) {
     return userService.login(loginRequest);

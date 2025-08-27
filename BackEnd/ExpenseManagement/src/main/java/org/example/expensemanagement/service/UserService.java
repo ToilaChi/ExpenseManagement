@@ -6,6 +6,8 @@ import org.example.expensemanagement.models.RefreshToken;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.UserRepository;
 import org.example.expensemanagement.security.JwtUtil;
+import org.example.expensemanagement.utils.ApiResponse;
+import org.example.expensemanagement.utils.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,8 +27,61 @@ public class UserService {
 
   @Autowired
   private RefreshTokenService refreshTokenService;
+
   @Autowired
   private UserRepository userRepository;
+
+  public RegisterResponse register(RegisterRequest registerRequest) {
+    try {
+      if(userRepository.existsByEmail(registerRequest.getPhone())) {
+        return new RegisterResponse("Số điện thoại đã tồn tại!!!", null);
+      }
+
+      Users user = new Users();
+      if(UserValidator.isValidPhone(registerRequest.getPhone())) {
+        return new RegisterResponse("Số điện thoại không hợp lệ! Phải có đủ 10 số", null);
+      }
+      user.setPhone(registerRequest.getPhone());
+
+      if(UserValidator.isValidEmail(registerRequest.getEmail())) {
+        return new RegisterResponse("Email không hợp lệ!!!", null);
+      }
+      user.setEmail(registerRequest.getEmail());
+
+      if(UserValidator.isValidPassword(registerRequest.getPassword())) {
+        return new RegisterResponse("Mật khẩu không hợp lệ! Phải có ít nhất 8 ký tự, bao gồm chữ, số và ký tự đặc biệt.", null);
+      }
+      user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+      user.setFullName(registerRequest.getFullName());
+
+      Users savedUser = userRepository.save(user);
+
+      //Tạo access token
+      String accessToken = jwtUtil.generateAccessToken(savedUser.getPhone(), savedUser.getId());
+
+      //Tạo refresh token
+      RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
+      String refreshTokenString = refreshToken.getToken();
+
+      RegisterResponse.AccountInfo accountInfo = new RegisterResponse.AccountInfo(
+              savedUser.getId(),
+              savedUser.getFullName(),
+              savedUser.getPhone(),
+              savedUser.getEmail()
+      );
+
+      RegisterResponse.DataInfo dataInfo = new RegisterResponse.DataInfo(
+              accessToken,
+              refreshTokenString,
+              accountInfo
+      );
+      return new RegisterResponse("Đăng ký thành công!!!", dataInfo);
+    } catch (Exception e) {
+      System.err.println("Registration error: " + e.getMessage());
+      e.printStackTrace();
+      return new RegisterResponse("Đăng ký thất bại: " + e.getMessage(), null);
+    }
+  }
 
   public LoginResponse login(LoginRequest loginRequest) {
     try {
