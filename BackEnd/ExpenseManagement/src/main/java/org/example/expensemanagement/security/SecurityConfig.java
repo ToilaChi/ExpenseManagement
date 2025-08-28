@@ -38,7 +38,7 @@ public class SecurityConfig {
                     .accessDeniedHandler(accessDeniedHandler())
             )
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/login", "/auth/logout", "/auth/register").permitAll()
+                    .requestMatchers("/auth/login", "/auth/logout", "/auth/register", "/auth/refresh-token").permitAll()
                     .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

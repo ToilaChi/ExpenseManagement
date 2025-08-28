@@ -8,7 +8,6 @@ import org.example.expensemanagement.models.ExpenseType;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.CategoryRepository;
 import org.example.expensemanagement.repository.UserRepository;
-import org.example.expensemanagement.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,50 +130,36 @@ public class CategoryService {
     return String.format("#%02X%02X%02X", r, g, b);
   }
 
-  // Cap nhat budget cho category
-  @Transactional
-  public Category updateCategoryBudget(Long categoryId, String userId, BigDecimal newBudget) {
-    Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
-            .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
-
-    if(category.getExpenseType() == ExpenseType.INCOME) {
-      category.setAllocatedBudget(newBudget);
-      category.setCurrentBudget(newBudget);
-    } else {
-      BigDecimal incomeAmount = getIncomeAmount(userId);
-      BigDecimal totalAllocated = getTotalAllocatedBudgetExcept(userId, categoryId);
-
-      if (totalAllocated.add(newBudget).compareTo(incomeAmount) > 0) {
-        throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
-      }
-
-      category.setAllocatedBudget(newBudget);
-      category.setCurrentBudget(newBudget);
-    }
-
-    return categoryRepository.save(category);
+  // Get list categories cua user
+  public List<Category> getUserCategories(String userId) {
+    return categoryRepository.findByUserIdOrderByExpenseTypeDescCreatedAtAsc(userId);
   }
 
-  // Cap nhat thong tin category
+  // Cap nhat  category
   @Transactional
-  public Category updateCategory(Long categoryId, String userId, String newName, String newColor) {
+  public Category updateCategory(Long categoryId, String userId, String newName, BigDecimal newBudget) {
     Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
 
+    // Đổi tên nếu truyền mới
     if (newName != null && !newName.trim().isEmpty()) {
       category.setName(newName);
     }
 
-    if (newColor != null && !newColor.trim().isEmpty()) {
-      category.setColorHex(newColor);
+    // Đổi budget nếu truyền mới
+    if (newBudget != null) {
+      if (category.getExpenseType() != ExpenseType.INCOME) {
+        BigDecimal incomeAmount = getIncomeAmount(userId);
+        BigDecimal totalAllocated = getTotalAllocatedBudgetExcept(userId, categoryId);
+        if (totalAllocated.add(newBudget).compareTo(incomeAmount) > 0) {
+          throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
+        }
+      }
+      category.setAllocatedBudget(newBudget);
+      category.setCurrentBudget(newBudget);
     }
 
     return categoryRepository.save(category);
-  }
-
-  // Get list categories cua user
-  public List<Category> getUserCategories(String userId) {
-    return categoryRepository.findByUserIdOrderByExpenseTypeDescCreatedAtAsc(userId);
   }
 
   // delete category

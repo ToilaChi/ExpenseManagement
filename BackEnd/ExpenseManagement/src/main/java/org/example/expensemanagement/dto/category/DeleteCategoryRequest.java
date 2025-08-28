@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteCategoryRequest {
-  private String accessToken;
   private Long categoryId;
 }

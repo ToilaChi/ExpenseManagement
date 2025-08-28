@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCategoryRequest {
-  private String accessToken;
-  private Long categoryId;
   private String categoryName;
-  private String colorHex;
+  private BigDecimal budget;
 }

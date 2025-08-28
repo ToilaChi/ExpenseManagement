@@ -54,7 +54,7 @@ public class AuthController {
 
       // Tao access token moi
       Users user = refreshToken.getUser();
-      String newAccessToken = jwtUtil.generateAccessToken(user.getFullName(), user.getId());
+      String newAccessToken = jwtUtil.generateAccessToken(user.getPhone(), user.getId());
 
       return ResponseEntity.ok(new ApiResponse<>("", new RefreshTokenResponse(refreshToken.getToken(), newAccessToken)));
     }
