@@ -78,7 +78,7 @@ public class CategoryController {
                 .body(new CategoryResponse(null, "User không tồn tại"));
       }
 
-      Category category = categoryService.createCategory(user.getId(), request.getCategoryName());
+      Category category = categoryService.createCategory(user.getId(), request.getCategoryName(), request.getAllocatedBudget());
 
       CategoryResponse.CategoryInfo categoryInfo = new CategoryResponse.CategoryInfo(
               category.getId(),

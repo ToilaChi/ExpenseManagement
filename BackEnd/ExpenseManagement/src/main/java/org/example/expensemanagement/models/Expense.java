@@ -35,5 +35,8 @@ public class Expense {
   private LocalDateTime updatedAt;
 
   @Column
+  private String description;
+
+  @Column
   private ExpenseType expenseType;
 }

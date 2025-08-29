@@ -89,16 +89,28 @@ public class CategoryService {
 
   //Create new category
   @Transactional
-  public Category createCategory(String userId, String categoryName) {
+  public Category createCategory(String userId, String categoryName, BigDecimal allocatedBudget) {
     Users user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
+
+    // Validate allocated
+    if (allocatedBudget == null || allocatedBudget.compareTo(BigDecimal.ZERO) < 0) {
+      throw new RuntimeException("Ngân sách phải lớn hơn hoặc bằng 0");
+    }
+
+    // Kiểm tra tổng allocated không vượt quá thu nhập
+    BigDecimal incomeAmount = getIncomeAmount(userId);
+    BigDecimal totalAllocated = getTotalAllocatedBudget(userId);
+    if (totalAllocated.add(allocatedBudget).compareTo(incomeAmount) > 0) {
+      throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
+    }
 
     Category category = new Category();
     category.setName(categoryName);
     category.setExpenseType(ExpenseType.EXPENSE);
     category.setUser(user);
-    category.setAllocatedBudget(BigDecimal.ZERO);
-    category.setCurrentBudget(BigDecimal.ZERO);
+    category.setAllocatedBudget(allocatedBudget);
+    category.setCurrentBudget(allocatedBudget);
     category.setColorHex(getNextAvailableColor(userId));
 
     return categoryRepository.save(category);
@@ -148,6 +160,10 @@ public class CategoryService {
 
     // Đổi budget nếu truyền mới
     if (newBudget != null) {
+      if (newBudget.compareTo(BigDecimal.ZERO) < 0) {
+        throw new RuntimeException("Ngân sách phải >= 0");
+      }
+
       if (category.getExpenseType() != ExpenseType.INCOME) {
         BigDecimal incomeAmount = getIncomeAmount(userId);
         BigDecimal totalAllocated = getTotalAllocatedBudgetExcept(userId, categoryId);
@@ -155,8 +171,20 @@ public class CategoryService {
           throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
         }
       }
+
+      //Giữ lại khoản đã chi
+      BigDecimal oldAllocated = category.getAllocatedBudget();
+      BigDecimal oldCurrent = category.getCurrentBudget();
+      BigDecimal spent = oldAllocated.subtract(oldCurrent);
+
+      // Tính currentBudget mới
+      BigDecimal newCurrent = newBudget.subtract(spent);
+//      if (newCurrent.compareTo(BigDecimal.ZERO) < 0) {
+//        newCurrent = BigDecimal.ZERO; // không cho âm
+//      }
+
       category.setAllocatedBudget(newBudget);
-      category.setCurrentBudget(newBudget);
+      category.setCurrentBudget(newCurrent);
     }
 
     return categoryRepository.save(category);
@@ -180,6 +208,13 @@ public class CategoryService {
     return categoryRepository.findByUserIdAndExpenseType(userId, ExpenseType.INCOME)
             .stream()
             .map(Category::getCurrentBudget)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  private BigDecimal getTotalAllocatedBudget(String userId) {
+    return categoryRepository.findByUserIdAndExpenseType(userId, ExpenseType.EXPENSE)
+            .stream()
+            .map(Category::getAllocatedBudget)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
