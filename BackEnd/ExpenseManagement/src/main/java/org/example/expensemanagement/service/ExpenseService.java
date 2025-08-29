@@ -108,7 +108,7 @@ public class ExpenseService {
     //Update budget cua categories
     // Hoan lai tien cho old category
     assert oldCategory != null;
-    oldCategory.setCurrentBudget(oldCategory.getCurrentBudget().add(finalAmount));
+    oldCategory.setCurrentBudget(oldCategory.getCurrentBudget().add(oldAmount));
 
     //Tru tien tu new category
     newCategory.setCurrentBudget(newCategory.getCurrentBudget().subtract(finalAmount));
@@ -119,6 +119,7 @@ public class ExpenseService {
     if(newDescription != null) {
       expense.setDescription(newDescription);
     }
+    expense.setUpdatedAt(LocalDateTime.now());
 
     categoryRepository.save(oldCategory);
     if(!oldCategory.equals(newCategory)) {
