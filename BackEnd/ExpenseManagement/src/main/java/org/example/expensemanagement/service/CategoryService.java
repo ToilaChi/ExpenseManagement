@@ -93,6 +93,10 @@ public class CategoryService {
     Users user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
 
+    if (categoryRepository.existsByNameAndUserId(categoryName.trim(), userId)) {
+      throw new RuntimeException("Tên category đã tồn tại!");
+    }
+
     // Validate allocated
     if (allocatedBudget == null || allocatedBudget.compareTo(BigDecimal.ZERO) < 0) {
       throw new RuntimeException("Ngân sách phải lớn hơn hoặc bằng 0");
@@ -198,6 +202,19 @@ public class CategoryService {
 
     if (!category.getExpenses().isEmpty()) {
       throw new RuntimeException("Không thể xóa category có giao dịch!");
+    }
+
+    //Hoan tien cho category INCOME
+    BigDecimal amountToRefund = category.getCurrentBudget();
+    if(amountToRefund.compareTo(BigDecimal.ZERO) < 0) {
+      Category incomeCategory = categoryRepository.findByUserIdAndExpenseType(userId, ExpenseType.INCOME)
+              .stream()
+              .findFirst()
+              .orElseThrow(() -> new RuntimeException("Không tìm thấy category thu nhập!"));
+
+      incomeCategory.setCurrentBudget(incomeCategory.getCurrentBudget().add(amountToRefund));
+      System.out.println("Đã hoàn " + amountToRefund + "đ từ category '" +
+              category.getName() + "' về 'Số dư tài khoản'");
     }
 
     categoryRepository.delete(category);

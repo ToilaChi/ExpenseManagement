@@ -26,6 +26,14 @@ public class CategoryController {
   @Autowired
   private UserRepository userRepository;
 
+
+  //Helper method
+  private String getTokenFromHeader(String header) {
+    if (header != null && header.startsWith("Bearer ")) {
+      return header.substring(7);
+    }
+    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
+  }
   private Users getCurrentUser(String accessToken) {
     String phone = jwtUtil.validateTokenAndRetrieveSubject(accessToken);
     return userRepository.findByPhone(phone);
@@ -157,13 +165,5 @@ public class CategoryController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
               .body(new CategoryResponse(null, "Lỗi: " + e.getMessage()));
     }
-  }
-
-  //Helper method
-  private String getTokenFromHeader(String header) {
-    if (header != null && header.startsWith("Bearer ")) {
-      return header.substring(7);
-    }
-    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
   }
 }

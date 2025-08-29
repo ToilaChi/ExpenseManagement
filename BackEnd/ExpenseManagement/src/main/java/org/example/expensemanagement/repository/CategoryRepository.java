@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
   Optional<Category> findByIdAndUserId(Long categoryId, String userId);
+  Optional<Category> findByNameAndUserId(String categoryName, String userId);
   List<Category> findByUserId(String userId);
 
   String user(Users user);
@@ -19,4 +20,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   List<Category> findByUserIdAndExpenseTypeAndIdNot(String userId, ExpenseType expenseType, Long excludeId);
 
   List<Category> findByUserIdOrderByExpenseTypeDescCreatedAtAsc(String userId);
+
+  boolean existsByNameAndUserId(String categoryName, String userId);
 }
