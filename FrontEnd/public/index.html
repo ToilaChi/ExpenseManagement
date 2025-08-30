@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Lý Chi Tiêu</title>
+    <link rel="stylesheet" href="../src/styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <img src="https://i.imgur.com/8QZQY8A.png" alt="Avatar" class="avatar">
+                <span class="user-name">HI, ns</span>
+            </div>
+            <nav class="navigation">
+                <button class="nav-button active"><i class="fas fa-home"></i> Trang chính</button>
+                <button class="nav-button"><i class="fas fa-chart-bar"></i> Báo cáo</button>
+                <button class="nav-button"><i class="fas fa-wallet"></i> Ngân sách</button>
+                <button class="nav-button"><i class="fas fa-cog"></i> Cài đặt</button>
+            </nav>
+            <button class="nav-button logout-button" onclick="logout()">Đăng xuất</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1>CHI TIÊU CẨN THẬN NHÉ!!!</h1>
+            </header>
+
+            <section class="summary-cards">
+                <div class="card">
+                    <div class="card-header">Số dư tài khoản</div>
+                    <div class="card-body" id="balance">XXXXXX vnd</div>
+                    <button class="card-button" onclick="updateBalance()">Cập nhật</button>
+                </div>
+                <div class="card card-green">
+                    <div class="card-header">Ăn uống</div>
+                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
+                    <div class="card-body" id="an-uong">XXXXXX vnd</div>
+                    <button class="card-button" onclick="updateCategory('an-uong')">Cập nhật</button>
+                </div>
+                <div class="card card-cyan">
+                    <div class="card-header">Cafe & đi chơi</div>
+                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
+                    <div class="card-body" id="cafe-di-choi">XXXXXX vnd</div>
+                    <button class="card-button" onclick="updateCategory('cafe-di-choi')">Cập nhật</button>
+                </div>
+                <div class="card card-orange">
+                    <div class="card-header">Xăng xe</div>
+                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
+                    <div class="card-body" id="xang-xe">XXXXXX vnd</div>
+                    <button class="card-button" onclick="updateCategory('xang-xe')">Cập nhật</button>
+                </div>
+                 <div class="add-card" onclick="addCategory()">
+                    <span>+</span>
+                </div>
+            </section>
+
+            <section class="statistics">
+                <div class="stats-header">
+                    <h2>THỐNG KÊ CHI PHÍ</h2>
+                    <div class="stats-filters">
+                        <button class="filter-button" onclick="getDailyStats(this)">NGÀY</button>
+                        <button class="filter-button active" onclick="getWeeklyStats(this)">TUẦN</button>
+                        <button class="filter-button" onclick="getMonthlyStats(this)">THÁNG</button>
+                    </div>
+                </div>
+                <div class="stats-body">
+                    <div class="chart-container">
+                        <div class="pie-chart"></div>
+                    </div>
+                    <div class="legend-container" id="legend-container">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #e0e0e0;"></span> Chưa có dữ liệu
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Loại</th>
+                                    <th>Chi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-table-body">
+                                <tr>
+                                    <td colspan="2">Nhấn vào Ngày/Tuần/Tháng để xem.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="custom-prompt-overlay" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <h3 id="prompt-title">Nhập thông tin</h3>
+            <input type="text" id="prompt-input" placeholder="Nhập tên danh mục mới...">
+            <div class="alert-buttons">
+                <button id="prompt-cancel-btn" class="alert-btn btn-cancel">Hủy</button>
+                <button id="prompt-confirm-btn" class="alert-btn btn-confirm">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../src/scripts/script.js"></script>
+</body>
+</html>

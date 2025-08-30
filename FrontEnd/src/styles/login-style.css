@@ -1,0 +1,195 @@
+/* Background gradient nhẹ dịu */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #a8c0ff, #d9e4f5); /* xanh nhạt pha xám */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Container pastel + glassmorphism */
+.auth-container {
+  background: rgba(240, 248, 255, 0.85);   /* xanh pastel nhẹ (aliceblue) */
+  backdrop-filter: blur(12px);
+  padding: 2rem;
+  width: 360px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  animation: fadeIn 0.6s ease;
+  border: 1px solid rgba(255, 255, 255, 0.4); /* viền mờ */
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: rgba(16,89,255,0.1);
+  color: #333;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 8px;
+  margin: 0 5px;
+  font-weight: 500;
+}
+
+.tabs button.active {
+  background: #1059ff;
+  color: #fff;
+  font-weight: bold;
+  transform: scale(1.05);
+}
+
+/* Forms */
+.form {
+  display: none;
+  flex-direction: column;
+  animation: fadeSlide 0.4s ease;
+}
+
+.form.active {
+  display: flex;
+}
+
+h2 {
+  text-align: center;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+label {
+  margin: 8px 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.9); /* hơi mờ, không trắng gắt */
+  color: #333;
+  font-size: 14px;
+}
+
+input::placeholder {
+  color: #777;
+}
+
+button[type="submit"] {
+  background: #1059ff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+button[type="submit"]:hover {
+  background: #0d47d9;
+}
+
+.helper {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.helper a {
+  font-size: 13px;
+  color: #1059ff;
+  text-decoration: none;
+}
+
+/* Animations */
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Kiểu cho hộp thoại tùy chỉnh (alert) --- */
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-alert-overlay.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.custom-alert-box {
+    background: rgba(240, 248, 255, 0.85);
+    backdrop-filter: blur(12px);
+    color: #222;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    width: 90%;
+    max-width: 340px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.custom-alert-overlay.active .custom-alert-box {
+    transform: scale(1);
+}
+
+.custom-alert-box h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.custom-alert-box p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.alert-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.alert-btn.btn-confirm {
+    background: #1059ff;
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.alert-btn.btn-confirm:hover {
+    background: #0d47d9;
+}
