@@ -3,11 +3,13 @@ package org.example.expensemanagement.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.example.expensemanagement.dto.category.CategoryResponse;
 import org.example.expensemanagement.models.Category;
 import org.example.expensemanagement.models.ExpenseType;
 import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.CategoryRepository;
 import org.example.expensemanagement.repository.UserRepository;
+import org.example.expensemanagement.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,24 +91,17 @@ public class CategoryService {
 
   //Create new category
   @Transactional
-  public Category createCategory(String userId, String categoryName, BigDecimal allocatedBudget) {
+  public ApiResponse<CategoryResponse.CategoryInfo> createCategory(String userId, String categoryName, BigDecimal allocatedBudget) {
     Users user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
 
     if (categoryRepository.existsByNameAndUserId(categoryName.trim(), userId)) {
-      throw new RuntimeException("Tên category đã tồn tại!");
+      return new ApiResponse<>("Tên category đã tồn tại!");
     }
 
     // Validate allocated
     if (allocatedBudget == null || allocatedBudget.compareTo(BigDecimal.ZERO) < 0) {
-      throw new RuntimeException("Ngân sách phải lớn hơn hoặc bằng 0");
-    }
-
-    // Kiểm tra tổng allocated không vượt quá thu nhập
-    BigDecimal incomeAmount = getIncomeAmount(userId);
-    BigDecimal totalAllocated = getTotalAllocatedBudget(userId);
-    if (totalAllocated.add(allocatedBudget).compareTo(incomeAmount) > 0) {
-      throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
+      return new ApiResponse<>("Ngân sách phải lớn hơn hoặc bằng 0");
     }
 
     Category category = new Category();
@@ -117,7 +112,24 @@ public class CategoryService {
     category.setCurrentBudget(allocatedBudget);
     category.setColorHex(getNextAvailableColor(userId));
 
-    return categoryRepository.save(category);
+    // Kiểm tra tổng allocated không vượt quá thu nhập
+    BigDecimal incomeAmount = getIncomeAmount(userId);
+    BigDecimal totalAllocated = getTotalAllocatedBudget(userId);
+    if (totalAllocated.add(allocatedBudget).compareTo(incomeAmount) > 0) {
+      return new ApiResponse<>("Tổng ngân sách vượt quá thu nhập!!!");
+    }
+
+    Category savedCategory = categoryRepository.save(category);
+    CategoryResponse.CategoryInfo categoryInfo = new CategoryResponse.CategoryInfo(
+            savedCategory.getId(),
+            savedCategory.getName(),
+            savedCategory.getColorHex(),
+            savedCategory.getExpenseType(),
+            savedCategory.getAllocatedBudget(),
+            savedCategory.getCurrentBudget()
+    );
+
+    return new ApiResponse<>("Tạo mục chi tiêu thành công!!!", categoryInfo);
   }
 
   // Lay mau tiep theo
@@ -153,55 +165,66 @@ public class CategoryService {
 
   // Cap nhat  category
   @Transactional
-  public Category updateCategory(Long categoryId, String userId, String newName, BigDecimal newBudget) {
+  public ApiResponse<CategoryResponse.CategoryInfo> updateCategory(Long categoryId, String userId, String newName, BigDecimal newBudget) {
     Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
 
     // Đổi tên nếu truyền mới
     if (newName != null && !newName.trim().isEmpty()) {
+      if (categoryRepository.existsByNameAndUserIdAndIdNot(newName.trim(), userId, categoryId)) {
+        return new ApiResponse<>("Tên category đã tồn tại!");
+      }
       category.setName(newName);
     }
 
     // Đổi budget nếu truyền mới
     if (newBudget != null) {
       if (newBudget.compareTo(BigDecimal.ZERO) < 0) {
-        throw new RuntimeException("Ngân sách phải >= 0");
+        return new ApiResponse<>("Ngân sách phải lớn hơn hoặc bằng 0");
       }
 
       if (category.getExpenseType() != ExpenseType.INCOME) {
         BigDecimal incomeAmount = getIncomeAmount(userId);
         BigDecimal totalAllocated = getTotalAllocatedBudgetExcept(userId, categoryId);
         if (totalAllocated.add(newBudget).compareTo(incomeAmount) > 0) {
-          throw new RuntimeException("Tổng ngân sách vượt quá thu nhập!!!");
+          return new ApiResponse<>("Tổng ngân sách vượt quá thu nhập!!!");
         }
       }
 
-      //Giữ lại khoản đã chi
+      // Giữ lại khoản đã chi
       BigDecimal oldAllocated = category.getAllocatedBudget();
       BigDecimal oldCurrent = category.getCurrentBudget();
       BigDecimal spent = oldAllocated.subtract(oldCurrent);
 
       // Tính currentBudget mới
       BigDecimal newCurrent = newBudget.subtract(spent);
-//      if (newCurrent.compareTo(BigDecimal.ZERO) < 0) {
-//        newCurrent = BigDecimal.ZERO; // không cho âm
-//      }
 
       category.setAllocatedBudget(newBudget);
       category.setCurrentBudget(newCurrent);
     }
 
-    return categoryRepository.save(category);
+    Category savedCategory = categoryRepository.save(category);
+
+    CategoryResponse.CategoryInfo categoryInfo = new CategoryResponse.CategoryInfo(
+            savedCategory.getId(),
+            savedCategory.getName(),
+            savedCategory.getColorHex(),
+            savedCategory.getExpenseType(),
+            savedCategory.getAllocatedBudget(),
+            savedCategory.getCurrentBudget()
+    );
+
+    return new ApiResponse<>("Cập nhật mục chi tiêu thành công", categoryInfo);
   }
 
   // delete category
   @Transactional
-  public void deleteCategory(Long categoryId, String userId) {
+  public ApiResponse<Void> deleteCategory(Long categoryId, String userId) {
     Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
 
     if (!category.getExpenses().isEmpty()) {
-      throw new RuntimeException("Không thể xóa category có giao dịch!");
+      return new ApiResponse<>("Không thể xóa category có giao dịch!");
     }
 
     //Hoan tien cho category INCOME
@@ -218,6 +241,8 @@ public class CategoryService {
     }
 
     categoryRepository.delete(category);
+
+    return new ApiResponse<>("Xóa category thành công");
   }
 
   // Helper methods

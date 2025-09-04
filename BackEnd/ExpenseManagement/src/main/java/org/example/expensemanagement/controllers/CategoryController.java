@@ -6,6 +6,7 @@ import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.UserRepository;
 import org.example.expensemanagement.security.JwtUtil;
 import org.example.expensemanagement.service.CategoryService;
+import org.example.expensemanagement.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +75,7 @@ public class CategoryController {
   }
 
   @PostMapping("/create")
-  public ResponseEntity<CategoryResponse> createCategory(
+  public ResponseEntity<ApiResponse<CategoryResponse.CategoryInfo>> createCategory(
           @RequestHeader("Authorization") String authorizationHeader,
           @RequestBody CreateCategoryRequest request
   ) {
@@ -83,31 +84,25 @@ public class CategoryController {
       Users user  = getCurrentUser(accessToken);
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new CategoryResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      Category category = categoryService.createCategory(user.getId(), request.getCategoryName(), request.getAllocatedBudget());
-
-      CategoryResponse.CategoryInfo categoryInfo = new CategoryResponse.CategoryInfo(
-              category.getId(),
-              category.getName(),
-              category.getColorHex(),
-              category.getExpenseType(),
-              category.getAllocatedBudget(),
-              category.getCurrentBudget()
+      ApiResponse<CategoryResponse.CategoryInfo> serviceResponse = categoryService.createCategory(
+              user.getId(),
+              request.getCategoryName(),
+              request.getAllocatedBudget()
       );
 
-      return ResponseEntity.ok(new CategoryResponse(categoryInfo,
-              "Tạo category thành công"));
+      return ResponseEntity.ok(serviceResponse);
     }
     catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new CategoryResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 
   @PatchMapping("/update/{id}")
-  public ResponseEntity<CategoryResponse> updateCategory(
+  public ResponseEntity<ApiResponse<CategoryResponse.CategoryInfo>> updateCategory(
           @RequestHeader("Authorization") String authorizationHeader,
           @PathVariable("id") Long categoryId,
           @RequestBody UpdateCategoryRequest request) {
@@ -116,36 +111,26 @@ public class CategoryController {
       Users user  = getCurrentUser(accessToken);
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new CategoryResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      Category category = categoryService.updateCategory(
+      ApiResponse<CategoryResponse.CategoryInfo> serviceResponse = categoryService.updateCategory(
               categoryId,
               user.getId(),
               request.getCategoryName(),
               request.getBudget()
       );
 
-      CategoryResponse.CategoryInfo categoryInfo = new CategoryResponse.CategoryInfo(
-              category.getId(),
-              category.getName(),
-              category.getColorHex(),
-              category.getExpenseType(),
-              category.getAllocatedBudget(),
-              category.getCurrentBudget()
-      );
-
-      return ResponseEntity.ok(new CategoryResponse(categoryInfo,
-              "Cập nhật category thành công"));
+      return ResponseEntity.ok(serviceResponse);
     }
     catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new CategoryResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 
   @DeleteMapping("/delete/{id}")
-  public ResponseEntity<CategoryResponse> deleteCategory(
+  public ResponseEntity<ApiResponse<Void>> deleteCategory(
           @RequestHeader("Authorization") String authorizationHeader,
           @PathVariable("id") Long categoryId) {
     try {
@@ -153,17 +138,16 @@ public class CategoryController {
       Users user  = getCurrentUser(accessToken);
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new CategoryResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      categoryService.deleteCategory(categoryId, user.getId());
+      ApiResponse<Void> serviceResponse = categoryService.deleteCategory(categoryId, user.getId());
 
-      return ResponseEntity.ok(new CategoryResponse(null,
-              "Xóa category thành công"));
+      return ResponseEntity.ok(serviceResponse);
     }
     catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new CategoryResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 }

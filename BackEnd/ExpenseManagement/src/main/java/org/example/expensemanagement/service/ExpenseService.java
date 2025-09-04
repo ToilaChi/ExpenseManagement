@@ -2,6 +2,7 @@ package org.example.expensemanagement.service;
 
 import jakarta.transaction.Transactional;
 import org.example.expensemanagement.dto.expense.ExpenseDetailResponse;
+import org.example.expensemanagement.dto.expense.ExpenseResponse;
 import org.example.expensemanagement.dto.expense.ExpenseSummaryResponse;
 import org.example.expensemanagement.models.Category;
 import org.example.expensemanagement.models.Expense;
@@ -10,6 +11,7 @@ import org.example.expensemanagement.models.Users;
 import org.example.expensemanagement.repository.CategoryRepository;
 import org.example.expensemanagement.repository.ExpenseRepository;
 import org.example.expensemanagement.repository.UserRepository;
+import org.example.expensemanagement.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -35,27 +37,31 @@ public class ExpenseService {
   private UserRepository userRepository;
 
   // Them chi tieu
-  public Expense addExpense(String userId, Long categoryId, BigDecimal amount, String description) {
+  public ApiResponse<ExpenseResponse.ExpenseInfo> addExpense(String userId, Long categoryId, BigDecimal amount, String description) {
     // Kiem tra user
     Users user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
     // Kiem tra cate co thuoc ve user do khong
     Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
-            .orElseThrow(() -> new RuntimeException("Category không tồn tại hoặc không thuộc về bạn"));
+            .orElse(null);
 
-    if(category.getExpenseType() != ExpenseType.EXPENSE) {
-      throw new RuntimeException("Không thể thêm chi tiêu vào category INCOME");
+    if (category == null) {
+      return new ApiResponse<>("Category không tồn tại hoặc không thuộc về bạn");
+    }
+
+    if (category.getExpenseType() != ExpenseType.EXPENSE) {
+      return new ApiResponse<>("Không thể thêm chi tiêu vào category INCOME");
     }
 
     //Validate amount > 0
     if (amount == null ||  amount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new RuntimeException("Số tiền phải lớn hơn 0");
+      return new ApiResponse<>("Số tiền phải lớn hơn 0");
     }
 
     // warning neu vuot qua so budget (nhung van cho phep)
     BigDecimal currentBudget = category.getCurrentBudget();
-    boolean isOverBudget = currentBudget.compareTo(amount) <= 0;
+    boolean isOverBudget = currentBudget.compareTo(amount) < 0;
 
     // expense record
     Expense expense = new Expense();
@@ -79,29 +85,56 @@ public class ExpenseService {
               category.getName() + ", Over by: " + amount.subtract(currentBudget));
     }
 
-    return savedExpense;
+    ExpenseResponse.ExpenseInfo expenseInfo = new ExpenseResponse.ExpenseInfo(
+            savedExpense.getId(),
+            savedExpense.getCategory().getName(),
+            savedExpense.getCategory().getColorHex(),
+            savedExpense.getAmount(),
+            savedExpense.getDescription(),
+            savedExpense.getCreatedAt(),
+            savedExpense.getUpdatedAt(),
+            savedExpense.getCategory().getCurrentBudget()
+    );
+
+    String message = isOverBudget ?
+            "Thêm chi tiêu thành công (Cảnh báo: Vượt ngân sách!)" :
+            "Thêm chi tiêu thành công";
+
+    return new ApiResponse<>(message, expenseInfo);
   }
 
   // Update expense
   @Transactional
-  public Expense updateExpense(String userId, Long expenseId, String newCategoryName, BigDecimal newAmount, String newDescription) {
+  public ApiResponse<ExpenseResponse.ExpenseInfo> updateExpense(String userId, Long expenseId, String newCategoryName, BigDecimal newAmount, String newDescription) {
     // Tim expense va validate ownership
     Expense expense = expenseRepository.findByIdAndCategoryUserId(expenseId, userId)
-            .orElseThrow(() -> new RuntimeException("Expense không tồn tại hoặc không thuộc về bạn"));
+            .orElse(null);
+
+    if (expense == null) {
+      return new ApiResponse<>("Expense không tồn tại hoặc không thuộc về bạn");
+    }
 
     Category oldCategory = expense.getCategory();
     BigDecimal oldAmount = expense.getAmount();
 
     //Validate new category neu update
     Category newCategory = oldCategory;
-    if(newCategoryName  != null && !newCategoryName.trim().isEmpty()
+    if (newCategoryName != null && !newCategoryName.trim().isEmpty()
             && !newCategoryName.equals(oldCategory.getName())) {
       newCategory = categoryRepository.findByNameAndUserId(newCategoryName, userId)
-              .orElseThrow(() -> new RuntimeException("Category '" + newCategoryName + "' không tồn tại"));
+              .orElse(null);
 
-      if(newCategory.getExpenseType() != ExpenseType.EXPENSE) {
-        throw new RuntimeException("Không thể chuyển expense sang category INCOME");
+      if (newCategory == null) {
+        return new ApiResponse<>("Category '" + newCategoryName + "' không tồn tại");
       }
+
+      if (newCategory.getExpenseType() != ExpenseType.EXPENSE) {
+        return new ApiResponse<>("Không thể chuyển expense sang category INCOME");
+      }
+    }
+
+    if (newAmount != null && newAmount.compareTo(BigDecimal.ZERO) <= 0) {
+      return new ApiResponse<>("Số tiền phải lớn hơn 0");
     }
 
     //Validate new amount
@@ -109,7 +142,6 @@ public class ExpenseService {
 
     //Update budget cua categories
     // Hoan lai tien cho old category
-    assert oldCategory != null;
     oldCategory.setCurrentBudget(oldCategory.getCurrentBudget().add(oldAmount));
 
     //Tru tien tu new category
@@ -128,23 +160,47 @@ public class ExpenseService {
       categoryRepository.save(newCategory);
     }
 
-    return expenseRepository.save(expense);
+    Expense savedExpense = expenseRepository.save(expense);
+
+    ExpenseResponse.ExpenseInfo expenseInfo = new ExpenseResponse.ExpenseInfo(
+            savedExpense.getId(),
+            savedExpense.getCategory().getName(),
+            savedExpense.getCategory().getColorHex(),
+            savedExpense.getAmount(),
+            savedExpense.getDescription(),
+            savedExpense.getCreatedAt(),
+            savedExpense.getUpdatedAt(),
+            savedExpense.getCategory().getCurrentBudget()
+    );
+
+    return new ApiResponse<>("Cập nhật chi tiêu thành công", expenseInfo);
   }
 
   //Delete expense
   @Transactional
-  public void deleteExpense(String userId, Long expenseId) {
-    Expense expense = expenseRepository.findByIdAndCategoryUserId(expenseId, userId)
-            .orElseThrow(() -> new RuntimeException("Expense không tồn tại hoặc không thuộc về bạn"));
+  public ApiResponse<Void> deleteExpense(String userId, Long expenseId) {
+    try {
+      Expense expense = expenseRepository.findByIdAndCategoryUserId(expenseId, userId)
+              .orElse(null);
 
-    Category category = expense.getCategory();
-    BigDecimal amount = expense.getAmount();
+      if (expense == null) {
+        return new ApiResponse<>("Expense không tồn tại hoặc không thuộc về bạn");
+      }
 
-    //Hoan lai tien cho category
-    category.setCurrentBudget(category.getCurrentBudget().add(amount));
-    categoryRepository.save(category);
+      Category category = expense.getCategory();
+      BigDecimal amount = expense.getAmount();
 
-    expenseRepository.delete(expense);
+      // Hoàn lại tiền cho category
+      category.setCurrentBudget(category.getCurrentBudget().add(amount));
+      categoryRepository.save(category);
+
+      expenseRepository.delete(expense);
+
+      return new ApiResponse<>("Xóa chi tiêu thành công", null);
+
+    } catch (Exception e) {
+      return new ApiResponse<>("Lỗi: " + e.getMessage());
+    }
   }
 
   //Filter

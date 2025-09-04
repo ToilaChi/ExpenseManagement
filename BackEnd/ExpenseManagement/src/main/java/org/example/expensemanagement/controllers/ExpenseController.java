@@ -7,6 +7,7 @@ import org.example.expensemanagement.repository.ExpenseRepository;
 import org.example.expensemanagement.repository.UserRepository;
 import org.example.expensemanagement.security.JwtUtil;
 import org.example.expensemanagement.service.ExpenseService;
+import org.example.expensemanagement.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class ExpenseController {
   }
 
   @PostMapping("/add")
-  public ResponseEntity<ExpenseResponse> addExpense(
+  public ResponseEntity<ApiResponse<ExpenseResponse.ExpenseInfo>> addExpense(
           @RequestHeader("Authorization") String authorizationHeader,
           @RequestBody AddExpenseRequest request
   ) {
@@ -52,32 +53,20 @@ public class ExpenseController {
 
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ExpenseResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      Expense expense = expenseService.addExpense(
+      ApiResponse<ExpenseResponse.ExpenseInfo> serviceResponse = expenseService.addExpense(
               user.getId(),
               request.getCategoryId(),
               request.getAmount(),
               request.getDescription()
       );
 
-      ExpenseResponse.ExpenseInfo expenseInfo = new ExpenseResponse.ExpenseInfo(
-              expense.getId(),
-              expense.getCategory().getName(),
-              expense.getCategory().getColorHex(),
-              expense.getAmount(),
-              expense.getDescription(),
-              expense.getCreatedAt(),
-              expense.getUpdatedAt(),
-              expense.getCategory().getCurrentBudget()
-      );
-
-      return ResponseEntity.ok(new ExpenseResponse(expenseInfo,
-              "Thêm chi tiêu thành công"));
+      return ResponseEntity.ok(serviceResponse);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new ExpenseResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 
@@ -130,7 +119,7 @@ public class ExpenseController {
   }
 
   @PutMapping("/update/{expenseId}")
-  public ResponseEntity<ExpenseResponse> updateExpense(
+  public ResponseEntity<ApiResponse<ExpenseResponse.ExpenseInfo>> updateExpense(
           @RequestHeader("Authorization") String authorizationHeader,
           @PathVariable Long expenseId,
           @RequestBody UpdateExpenseRequest request) {
@@ -140,10 +129,10 @@ public class ExpenseController {
 
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ExpenseResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      Expense expense = expenseService.updateExpense(
+      ApiResponse<ExpenseResponse.ExpenseInfo> serviceResponse = expenseService.updateExpense(
               user.getId(),
               expenseId,
               request.getNewCategoryName(),
@@ -151,27 +140,15 @@ public class ExpenseController {
               request.getNewDescription()
       );
 
-      ExpenseResponse.ExpenseInfo expenseInfo = new ExpenseResponse.ExpenseInfo(
-              expense.getId(),
-              expense.getCategory().getName(),
-              expense.getCategory().getColorHex(),
-              expense.getAmount(),
-              expense.getDescription(),
-              expense.getCreatedAt(),
-              expense.getUpdatedAt(),
-              expense.getCategory().getCurrentBudget()
-      );
-
-      return ResponseEntity.ok(new ExpenseResponse(expenseInfo,
-              "Cập nhật chi tiêu thành công"));
+      return ResponseEntity.ok(serviceResponse);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new ExpenseResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 
   @DeleteMapping("/delete/{expenseId}")
-  public ResponseEntity<ExpenseResponse> deleteExpense(
+  public ResponseEntity<ApiResponse<Void>> deleteExpense(
           @RequestHeader("Authorization") String authorizationHeader,
           @PathVariable Long expenseId) {
     try {
@@ -180,17 +157,16 @@ public class ExpenseController {
 
       if (user == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ExpenseResponse(null, "User không tồn tại"));
+                .body(new ApiResponse<>("User không tồn tại", null));
       }
 
-      // Delete expense
-      expenseService.deleteExpense(user.getId(), expenseId);
+      ApiResponse<Void> serviceResponse = expenseService.deleteExpense(user.getId(), expenseId);
 
-      return ResponseEntity.ok(new ExpenseResponse(null, "Xóa chi tiêu thành công"));
+      return ResponseEntity.ok(serviceResponse);
 
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new ExpenseResponse(null, "Lỗi: " + e.getMessage()));
+              .body(new ApiResponse<>("Lỗi: " + e.getMessage(), null));
     }
   }
 }
