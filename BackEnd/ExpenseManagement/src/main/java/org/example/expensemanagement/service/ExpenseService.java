@@ -1,6 +1,8 @@
 package org.example.expensemanagement.service;
 
 import jakarta.transaction.Transactional;
+import org.example.expensemanagement.dto.expense.ExpenseDetailResponse;
+import org.example.expensemanagement.dto.expense.ExpenseSummaryResponse;
 import org.example.expensemanagement.models.Category;
 import org.example.expensemanagement.models.Expense;
 import org.example.expensemanagement.models.ExpenseType;
@@ -9,17 +11,17 @@ import org.example.expensemanagement.repository.CategoryRepository;
 import org.example.expensemanagement.repository.ExpenseRepository;
 import org.example.expensemanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -190,5 +192,78 @@ public class ExpenseService {
     catch (Exception e) {
       throw new RuntimeException("Lỗi parse date: " + e.getMessage());
     }
+  }
+
+  // Summary cho pie chart
+  public List<ExpenseSummaryResponse.CategorySummary> getExpenseSummary(
+          String userId, String filterType, String date) {
+    Page<Expense> expenses = getFilteredExpenses(userId, filterType, date, 0, Integer.MAX_VALUE);
+
+    // Group category va tinh tong
+    Map<String, BigDecimal> categoryTotals = expenses.getContent()
+            .stream()
+            .collect(Collectors.groupingBy(
+                    expense -> expense.getCategory().getName(),
+                    Collectors.reducing(BigDecimal.ZERO, Expense::getAmount, BigDecimal::add)
+            ));
+
+    BigDecimal grandTotal = categoryTotals.values().stream()
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    return categoryTotals.entrySet().stream()
+            .map(entry -> {
+              String categoryName = entry.getKey();
+              BigDecimal totalSpent = entry.getValue();
+
+              Category category = categoryRepository.findByNameAndUserId(categoryName, userId)
+                      .orElse(null);
+              String colorHex = category != null ? category.getColorHex() : "#CCCCCC";
+
+              // Tinh percentage
+              BigDecimal percentage = grandTotal.compareTo(BigDecimal.ZERO) > 0
+                      ? totalSpent.multiply(BigDecimal.valueOf(100))
+                        .divide(grandTotal, 1, RoundingMode.HALF_UP)
+                      : BigDecimal.ZERO;
+
+              // Count transactions
+              int transactionCount = (int) expenses.getContent().stream()
+                      .filter(exp -> exp.getCategory().getName().equals(categoryName))
+                      .count();
+
+              return new ExpenseSummaryResponse.CategorySummary(
+                      categoryName, colorHex, totalSpent, percentage, transactionCount
+              );
+            })
+            .toList();
+  }
+
+  //Summary stats
+  public ExpenseSummaryResponse.SummaryStats getSummaryStats(String userId, String filterType, String date) {
+    Page<Expense> expenses = getFilteredExpenses(userId, filterType, date, 0, Integer.MAX_VALUE);
+
+    BigDecimal grandTotal = expenses.getContent().stream()
+            .map(Expense::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    return new ExpenseSummaryResponse.SummaryStats(grandTotal, filterType, date);
+  }
+
+  // Detail table cho power BI
+  public Page<ExpenseDetailResponse.ExpenseDetail> getExpenseDetail(
+          String userId, String filterType, String date, int page, int size) {
+    Page<Expense> expensePage = getFilteredExpenses(userId, filterType, date, page, size);
+
+    List<ExpenseDetailResponse.ExpenseDetail> details = expensePage.getContent().stream()
+            .map(expense -> new ExpenseDetailResponse.ExpenseDetail(
+                    expense.getCreatedAt(),
+                    expense.getCategory().getName(),
+                    expense.getAmount(),
+                    expense.getDescription(),
+                    expense.getCategory().getColorHex()
+            ))
+            .toList();
+
+    return new PageImpl<>(details, expensePage.getPageable(),
+            expensePage.getTotalElements());
   }
 }

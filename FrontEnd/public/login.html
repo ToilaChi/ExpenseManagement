@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đăng nhập / Đăng ký</title>
   <link rel="stylesheet" href="../src/styles/login-style.css">
 </head>
+
 <body>
   <div class="auth-container">
     <div class="tabs">
@@ -15,11 +17,15 @@
 
     <form id="login-form" class="form active">
       <h2>Chào mừng trở lại</h2>
-      <label for="login-username">Tên người dùng</label>
-      <input type="text" id="login-username" placeholder="Nhập tên người dùng" required>
+      <label for="login-phone">Số điện thoại</label>
+      <input type="tel" id="login-phone" placeholder="Nhập số điện thoại" required>
 
-      <label for="login-password">Mật khẩu</label>
-      <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
+      <div class="password-field">
+        <input type="password" id="login-password" placeholder="Mật khẩu" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">
+          <span class="eye-icon">👁️</span>
+        </button>
+      </div>
 
       <button type="submit">Đăng nhập</button>
       <p class="helper"><a href="#">Quên mật khẩu?</a></p>
@@ -30,29 +36,42 @@
       <label for="fullname">Họ và Tên</label>
       <input type="text" id="fullname" placeholder="Nhập họ và tên" required>
 
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="Nhập email" required>
 
-      <label for="password">Mật khẩu</label>
-      <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+      <div class="password-field">
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
+          <span class="eye-icon">👁️</span>
+        </button>
+      </div>
 
-      <label for="confirm-password">Xác nhận Mật khẩu</label>
-      <input type="password" id="confirm-password" placeholder="Xác nhận lại mật khẩu" required>
+      <div class="password-field">
+        <input type="password" id="confirm-password" placeholder="Xác nhận Mật khẩu" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('confirm-password', this)">
+          <span class="eye-icon">👁️</span>
+        </button>
+      </div>
 
       <button type="submit">Đăng ký</button>
     </form>
   </div>
 
   <div id="custom-alert-overlay" class="custom-alert-overlay">
-      <div class="custom-alert-box">
-          <h3 id="alert-title">Thông báo</h3>
-          <p id="alert-message">Nội dung thông báo ở đây.</p>
-          <div class="alert-buttons">
-              <button id="alert-ok-btn" class="alert-btn btn-confirm">OK</button>
-          </div>
+    <div class="custom-alert-box">
+      <h3 id="alert-title">Thông báo</h3>
+      <p id="alert-message">Nội dung thông báo ở đây.</p>
+      <div class="alert-buttons">
+        <button id="alert-ok-btn" class="alert-btn btn-confirm">OK</button>
       </div>
+    </div>
   </div>
 
   <script src="../src/scripts/login-script.js"></script>
+  <script src="../src/scripts/api/api-service.js"></script>
 </body>
+
 </html>

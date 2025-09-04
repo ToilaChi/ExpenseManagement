@@ -1,7 +1,8 @@
 /* Background gradient nhẹ dịu */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #a8c0ff, #d9e4f5); /* xanh nhạt pha xám */
+  background: linear-gradient(135deg, #a8c0ff, #d9e4f5);
+  /* xanh nhạt pha xám */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,14 +12,16 @@ body {
 
 /* Container pastel + glassmorphism */
 .auth-container {
-  background: rgba(240, 248, 255, 0.85);   /* xanh pastel nhẹ (aliceblue) */
+  background: rgba(240, 248, 255, 0.85);
+  /* xanh pastel nhẹ (aliceblue) */
   backdrop-filter: blur(12px);
   padding: 2rem;
   width: 360px;
   border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   animation: fadeIn 0.6s ease;
-  border: 1px solid rgba(255, 255, 255, 0.4); /* viền mờ */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  /* viền mờ */
 }
 
 /* Tabs */
@@ -32,7 +35,7 @@ body {
   flex: 1;
   padding: 12px;
   border: none;
-  background: rgba(16,89,255,0.1);
+  background: rgba(16, 89, 255, 0.1);
   color: #333;
   cursor: pointer;
   transition: 0.3s;
@@ -77,7 +80,8 @@ input {
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-bottom: 12px;
-  background: rgba(255,255,255,0.9); /* hơi mờ, không trắng gắt */
+  background: rgba(255, 255, 255, 0.9);
+  /* hơi mờ, không trắng gắt */
   color: #333;
   font-size: 14px;
 }
@@ -112,84 +116,159 @@ button[type="submit"]:hover {
   text-decoration: none;
 }
 
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.password-field input {
+  width: 100%;
+  padding: 12px 30px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.password-field input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 16px;
+  z-index: 1;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+.password-toggle:focus {
+  outline: none;
+  background-color: #e0e0e0;
+}
+
+.password-toggle:active {
+  background-color: #d0d0d0;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  user-select: none;
+  /* margin-bottom: 10px; */
+  padding-bottom: 10px;
+}
+
 /* Animations */
 @keyframes fadeSlide {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Kiểu cho hộp thoại tùy chỉnh (alert) --- */
 .custom-alert-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .custom-alert-overlay.active {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 .custom-alert-box {
-    background: rgba(240, 248, 255, 0.85);
-    backdrop-filter: blur(12px);
-    color: #222;
-    padding: 2rem;
-    border-radius: 14px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    width: 90%;
-    max-width: 340px;
-    text-align: center;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
+  background: rgba(240, 248, 255, 0.85);
+  backdrop-filter: blur(12px);
+  color: #222;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
 }
 
 .custom-alert-overlay.active .custom-alert-box {
-    transform: scale(1);
+  transform: scale(1);
 }
 
 .custom-alert-box h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
+  margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .custom-alert-box p {
-    margin-bottom: 20px;
-    line-height: 1.5;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .alert-buttons {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .alert-btn.btn-confirm {
-    background: #1059ff;
-    color: white;
-    padding: 10px 30px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-weight: bold;
+  background: #1059ff;
+  color: white;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
 }
 
 .alert-btn.btn-confirm:hover {
-    background: #0d47d9;
+  background: #0d47d9;
 }

@@ -31,18 +31,43 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
-    RegisterResponse response = userService.register(registerRequest);
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    try {
+      RegisterResponse response = userService.register(registerRequest);
+      if (response.getData() != null) {
+        return ResponseEntity.ok(response);
+      } else {
+        return ResponseEntity.badRequest().body(response);
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(new RegisterResponse("Lỗi server: " + e.getMessage(), null));
+    }
   }
 
   @PostMapping("/login")
-  public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-    return userService.login(loginRequest);
+  public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    try {
+      LoginResponse response = userService.login(loginRequest);
+      if (response.getData() != null) {
+        return ResponseEntity.ok(response);
+      } else {
+        return ResponseEntity.badRequest().body(response);
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(new LoginResponse(null, "Lỗi server: " + e.getMessage()));
+    }
   }
 
   @PostMapping("/logout")
-  public LogoutResponse logout(@RequestBody LogoutRequest logoutRequest) {
-    return userService.logout(logoutRequest);
+  public ResponseEntity<LogoutResponse> logout(@RequestBody LogoutRequest logoutRequest) {
+    try {
+      LogoutResponse response = userService.logout(logoutRequest);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(new LogoutResponse("Lỗi server: " + e.getMessage()));
+    }
   }
 
   @PostMapping("/refresh-token")

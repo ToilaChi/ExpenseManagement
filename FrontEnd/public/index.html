@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,74 +9,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
-        <aside class="sidebar">
+        <!-- Sidebar -->
+        <div class="sidebar">
             <div class="user-profile">
-                <img src="https://i.imgur.com/8QZQY8A.png" alt="Avatar" class="avatar">
-                <span class="user-name">HI, ns</span>
+                <img src="https://via.placeholder.com/60" alt="Avatar" class="avatar">
+                <div class="user-name" id="user-name">Loading...</div>
             </div>
             <nav class="navigation">
-                <button class="nav-button active"><i class="fas fa-home"></i> Trang chính</button>
-                <button class="nav-button"><i class="fas fa-chart-bar"></i> Báo cáo</button>
-                <button class="nav-button"><i class="fas fa-wallet"></i> Ngân sách</button>
-                <button class="nav-button"><i class="fas fa-cog"></i> Cài đặt</button>
+                <button class="nav-button active">📊 Tổng quan</button>
+                <button class="nav-button">💰 Thu nhập</button>
+                <button class="nav-button">🛒 Chi tiêu</button>
+                <button class="nav-button">📈 Báo cáo</button>
             </nav>
-            <button class="nav-button logout-button" onclick="logout()">Đăng xuất</button>
-        </aside>
+            <button class="nav-button logout-button" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1>CHI TIÊU CẨN THẬN NHÉ!!!</h1>
-            </header>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="main-header">
+                <h1>🏠 QUẢN LÝ CHI TIÊU CÁ NHÂN</h1>
+            </div>
 
-            <section class="summary-cards">
-                <div class="card">
-                    <div class="card-header">Số dư tài khoản</div>
-                    <div class="card-body" id="balance">XXXXXX vnd</div>
-                    <button class="card-button" onclick="updateBalance()">Cập nhật</button>
-                </div>
-                <div class="card card-green">
-                    <div class="card-header">Ăn uống</div>
-                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
-                    <div class="card-body" id="an-uong">XXXXXX vnd</div>
-                    <button class="card-button" onclick="updateCategory('an-uong')">Cập nhật</button>
-                </div>
-                <div class="card card-cyan">
-                    <div class="card-header">Cafe & đi chơi</div>
-                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
-                    <div class="card-body" id="cafe-di-choi">XXXXXX vnd</div>
-                    <button class="card-button" onclick="updateCategory('cafe-di-choi')">Cập nhật</button>
-                </div>
-                <div class="card card-orange">
-                    <div class="card-header">Xăng xe</div>
-                    <button class="delete-btn" onclick="deleteCategory(this)">&times;</button>
-                    <div class="card-body" id="xang-xe">XXXXXX vnd</div>
-                    <button class="card-button" onclick="updateCategory('xang-xe')">Cập nhật</button>
-                </div>
-                 <div class="add-card" onclick="addCategory()">
-                    <span>+</span>
-                </div>
-            </section>
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summary-cards">
+                <!-- Categories sẽ được load từ API -->
+            </div>
 
-            <section class="statistics">
+            <!-- Statistics -->
+            <div class="statistics">
                 <div class="stats-header">
                     <h2>THỐNG KÊ CHI PHÍ</h2>
                     <div class="stats-filters">
-                        <button class="filter-button" onclick="getDailyStats(this)">NGÀY</button>
-                        <button class="filter-button active" onclick="getWeeklyStats(this)">TUẦN</button>
-                        <button class="filter-button" onclick="getMonthlyStats(this)">THÁNG</button>
+                        <button class="filter-button active" data-period="day">NGÀY</button>
+                        <button class="filter-button" data-period="week">TUẦN</button>
+                        <button class="filter-button" data-period="month">THÁNG</button>
                     </div>
                 </div>
+
                 <div class="stats-body">
                     <div class="chart-container">
-                        <div class="pie-chart"></div>
+                        <div class="pie-chart" id="pie-chart"></div>
                     </div>
+
                     <div class="legend-container" id="legend-container">
                         <div class="legend-item">
-                            <span class="legend-color" style="background-color: #e0e0e0;"></span> Chưa có dữ liệu
+                            <div class="legend-color" style="background-color: #e0e0e0;"></div>
+                            <span>Chưa có dữ liệu</span>
                         </div>
                     </div>
+
                     <div class="table-container">
                         <table>
                             <thead>
@@ -84,7 +70,7 @@
                                     <th>Chi</th>
                                 </tr>
                             </thead>
-                            <tbody id="expense-table-body">
+                            <tbody id="stats-table-body">
                                 <tr>
                                     <td colspan="2">Nhấn vào Ngày/Tuần/Tháng để xem.</td>
                                 </tr>
@@ -92,21 +78,80 @@
                         </table>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="custom-prompt-overlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <h3 id="prompt-title">Nhập thông tin</h3>
-            <input type="text" id="prompt-input" placeholder="Nhập tên danh mục mới...">
-            <div class="alert-buttons">
-                <button id="prompt-cancel-btn" class="alert-btn btn-cancel">Hủy</button>
-                <button id="prompt-confirm-btn" class="alert-btn btn-confirm">Đồng ý</button>
             </div>
         </div>
     </div>
 
-    <script src="../src/scripts/script.js"></script>
+    <!-- Modal: Tạo Category -->
+    <div id="create-category-overlay" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <h3>Thêm danh mục mới</h3>
+            <form id="create-category-form">
+                <input type="text" id="new-category-name" placeholder="Nhập tên danh mục" required>
+                <input type="number" id="new-category-budget" placeholder="Ngân sách (VNĐ)" required min="0"
+                    step="1000">
+                <div class="alert-buttons">
+                    <button type="button" class="alert-btn btn-cancel"
+                        onclick="closeCustomAlert('create-category-overlay')">Hủy</button>
+                    <button type="submit" class="alert-btn btn-confirm">Tạo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Cập nhật Category -->
+    <div id="update-category-overlay" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <h3>Cập nhật danh mục</h3>
+            <form id="update-category-form">
+                <input type="hidden" id="update-category-id">
+                <input type="text" id="update-category-name" placeholder="Tên mục mới (để trống nếu không đổi)">
+                <input type="number" id="update-category-budget" placeholder="Ngân sách (VNĐ)" min="0" step="1000">
+                <div class="alert-buttons">
+                    <button type="button" class="alert-btn btn-cancel"
+                        onclick="closeCustomAlert('update-category-overlay')">Hủy</button>
+                    <button type="submit" class="alert-btn btn-confirm">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Chi tiêu -->
+    <div id="expense-overlay" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <h3 id="expense-modal-title">Thêm chi tiêu</h3>
+            <form id="expense-form">
+                <input type="hidden" id="expense-category-id">
+                <input type="number" id="expense-amount" placeholder="Số tiền (VNĐ)" required min="1" step="1000">
+                <input type="text" id="expense-description" placeholder="Mô tả chi tiêu...">
+                <div class="alert-buttons">
+                    <button type="button" class="alert-btn btn-cancel"
+                        onclick="closeCustomAlert('expense-overlay')">Hủy</button>
+                    <button type="submit" class="alert-btn btn-confirm">Thêm chi tiêu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Notification -->
+    <div id="custom-alert-overlay" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <h3>Thông báo</h3>
+            <p id="alert-message">Nội dung thông báo ở đây.</p>
+            <div class="alert-buttons">
+                <button id="alert-ok-btn" class="alert-btn btn-confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../src/scripts/utils/constants.js"></script>
+    <script src="../src/scripts/api/api-service.js"></script>
+    <script src="../src/scripts/api/category-api.js"></script>
+    <script src="../src/scripts/utils/format-utils.js"></script>
+    <script src="../src/scripts/utils/modal-manager.js"></script>
+    <script src="../src/scripts/components/category-manager.js"></script>
+    <script src="../src/scripts/utils/auth-utils.js"></script>
 </body>
+
 </html>

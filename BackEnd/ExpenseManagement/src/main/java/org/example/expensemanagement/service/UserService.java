@@ -42,7 +42,7 @@ public class UserService {
 
   public RegisterResponse register(RegisterRequest registerRequest) {
     try {
-      if(userRepository.existsByEmail(registerRequest.getPhone())) {
+      if(userRepository.existsByEmail(registerRequest.getEmail())) {
         return new RegisterResponse("Số điện thoại đã tồn tại!!!", null);
       }
 
@@ -172,7 +172,7 @@ public class UserService {
   public UserInfoResponse getInfo(UserInfoRequest userInfoRequest) {
     try {
       String accessToken = userInfoRequest.getAccessToken();
-      if(accessToken == null && accessToken.isEmpty()) {
+      if(accessToken == null || accessToken.isEmpty()) {
         return new UserInfoResponse(null, "Access không được để trống!!!");
       }
 
