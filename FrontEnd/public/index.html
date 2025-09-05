@@ -41,117 +41,143 @@
 
             <!-- Statistics -->
             <div class="statistics">
-                <div class="stats-header">
-                    <h2>THỐNG KÊ CHI PHÍ</h2>
-                    <div class="stats-filters">
-                        <button class="filter-button active" data-period="day">NGÀY</button>
-                        <button class="filter-button" data-period="week">TUẦN</button>
-                        <button class="filter-button" data-period="month">THÁNG</button>
-                    </div>
-                </div>
+                <!-- EXPENSE TABLE SECTION -->
+                <div class="stats-section">
+                    <div class="stats-header">
+                        <h2>📊 THỐNG KÊ CHI PHÍ</h2>
 
-                <div class="stats-body">
-                    <div class="chart-container">
-                        <div class="pie-chart" id="pie-chart"></div>
-                    </div>
-
-                    <div class="legend-container" id="legend-container">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #e0e0e0;"></div>
-                            <span>Chưa có dữ liệu</span>
+                        <!-- Filter buttons -->
+                        <div class="filter-container">
+                            <button class="filter-button active" onclick="setExpenseFilter('day')">NGÀY</button>
+                            <button class="filter-button" onclick="setExpenseFilter('week')">TUẦN</button>
+                            <button class="filter-button" onclick="setExpenseFilter('month')">THÁNG</button>
                         </div>
                     </div>
 
+                    <!-- Expense Table -->
                     <div class="table-container">
-                        <table>
+                        <table id="expense-table">
                             <thead>
                                 <tr>
                                     <th>Loại</th>
+                                    <th>Ngày</th>
                                     <th>Chi</th>
+                                    <th>Mô tả</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="stats-table-body">
+                            <tbody>
                                 <tr>
-                                    <td colspan="2">Nhấn vào Ngày/Tuần/Tháng để xem.</td>
+                                    <td colspan="5" style="text-align: center; color: #666; padding: 20px;">
+                                        Nhấn vào Ngày/Tuần/Tháng để xem.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div id="pagination-info" class="pagination-info"></div>
+                    </div>
+                </div>
+
+                <!-- Update Expense Modal -->
+                <div id="update-expense-overlay" class="custom-alert-overlay">
+                    <div class="custom-alert-box">
+                        <h3 id="update-expense-modal-title">Cập nhật chi tiêu</h3>
+                        <form id="update-expense-form">
+                            <input type="hidden" id="update-expense-id">
+
+                            <label for="update-expense-category">Danh mục mới (để trống nếu không đổi):</label>
+                            <input type="text" id="update-expense-category" placeholder="Tên danh mục">
+
+                            <label for="update-expense-amount">Số tiền mới (để trống nếu không đổi):</label>
+                            <input type="number" id="update-expense-amount" step="0.01" min="0" placeholder="0">
+
+                            <label for="update-expense-description">Mô tả mới (để trống nếu không đổi):</label>
+                            <input id="update-expense-description" placeholder="Mô tả chi tiêu"></input>
+
+                            <div class="alert-actions">
+                                <button type="button" class="alert-btn btn-cancel"
+                                    onclick="closeCustomAlert('update-expense-overlay')">Hủy</button>
+                                <button type="submit" class="alert-btn btn-confirm">Cập nhật</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal: Tạo Category -->
+            <div id="create-category-overlay" class="custom-alert-overlay">
+                <div class="custom-alert-box">
+                    <h3>Thêm danh mục mới</h3>
+                    <form id="create-category-form">
+                        <input type="text" id="new-category-name" placeholder="Nhập tên danh mục" required>
+                        <input type="number" id="new-category-budget" placeholder="Ngân sách (VNĐ)" required min="0"
+                            step="1000">
+                        <div class="alert-buttons">
+                            <button type="button" class="alert-btn btn-cancel"
+                                onclick="closeCustomAlert('create-category-overlay')">Hủy</button>
+                            <button type="submit" class="alert-btn btn-confirm">Tạo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal: Cập nhật Category -->
+            <div id="update-category-overlay" class="custom-alert-overlay">
+                <div class="custom-alert-box">
+                    <h3>Cập nhật danh mục</h3>
+                    <form id="update-category-form">
+                        <input type="hidden" id="update-category-id">
+                        <input type="text" id="update-category-name" placeholder="Tên mục mới (để trống nếu không đổi)">
+                        <input type="number" id="update-category-budget" placeholder="Ngân sách (VNĐ)" min="0"
+                            step="1000">
+                        <div class="alert-buttons">
+                            <button type="button" class="alert-btn btn-cancel"
+                                onclick="closeCustomAlert('update-category-overlay')">Hủy</button>
+                            <button type="submit" class="alert-btn btn-confirm">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal: Chi tiêu -->
+            <div id="expense-overlay" class="custom-alert-overlay">
+                <div class="custom-alert-box">
+                    <h3 id="expense-modal-title">Thêm chi tiêu</h3>
+                    <form id="expense-form">
+                        <input type="hidden" id="expense-category-id">
+                        <input type="text" id="expense-amount" placeholder="Số tiền (VNĐ)" required min="1" step="1000">
+                        <input type="text" id="expense-description" placeholder="Mô tả chi tiêu...">
+                        <div class="alert-buttons">
+                            <button type="button" class="alert-btn btn-cancel"
+                                onclick="closeCustomAlert('expense-overlay')">Hủy</button>
+                            <button type="submit" class="alert-btn btn-confirm">Thêm chi tiêu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Custom Alert/Notification -->
+            <div id="custom-alert-overlay" class="custom-alert-overlay">
+                <div class="custom-alert-box">
+                    <h3>Thông báo</h3>
+                    <p id="alert-message">Nội dung thông báo ở đây.</p>
+                    <div class="alert-buttons">
+                        <button id="alert-ok-btn" class="alert-btn btn-confirm">OK</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal: Tạo Category -->
-    <div id="create-category-overlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <h3>Thêm danh mục mới</h3>
-            <form id="create-category-form">
-                <input type="text" id="new-category-name" placeholder="Nhập tên danh mục" required>
-                <input type="number" id="new-category-budget" placeholder="Ngân sách (VNĐ)" required min="0"
-                    step="1000">
-                <div class="alert-buttons">
-                    <button type="button" class="alert-btn btn-cancel"
-                        onclick="closeCustomAlert('create-category-overlay')">Hủy</button>
-                    <button type="submit" class="alert-btn btn-confirm">Tạo</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Cập nhật Category -->
-    <div id="update-category-overlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <h3>Cập nhật danh mục</h3>
-            <form id="update-category-form">
-                <input type="hidden" id="update-category-id">
-                <input type="text" id="update-category-name" placeholder="Tên mục mới (để trống nếu không đổi)">
-                <input type="number" id="update-category-budget" placeholder="Ngân sách (VNĐ)" min="0" step="1000">
-                <div class="alert-buttons">
-                    <button type="button" class="alert-btn btn-cancel"
-                        onclick="closeCustomAlert('update-category-overlay')">Hủy</button>
-                    <button type="submit" class="alert-btn btn-confirm">Cập nhật</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Chi tiêu -->
-    <div id="expense-overlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <h3 id="expense-modal-title">Thêm chi tiêu</h3>
-            <form id="expense-form">
-                <input type="hidden" id="expense-category-id">
-                <input type="number" id="expense-amount" placeholder="Số tiền (VNĐ)" required min="1" step="1000">
-                <input type="text" id="expense-description" placeholder="Mô tả chi tiêu...">
-                <div class="alert-buttons">
-                    <button type="button" class="alert-btn btn-cancel"
-                        onclick="closeCustomAlert('expense-overlay')">Hủy</button>
-                    <button type="submit" class="alert-btn btn-confirm">Thêm chi tiêu</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Custom Alert/Notification -->
-    <div id="custom-alert-overlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <h3>Thông báo</h3>
-            <p id="alert-message">Nội dung thông báo ở đây.</p>
-            <div class="alert-buttons">
-                <button id="alert-ok-btn" class="alert-btn btn-confirm">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="../src/scripts/utils/constants.js"></script>
-    <script src="../src/scripts/api/api-service.js"></script>
-    <script src="../src/scripts/api/category-api.js"></script>
-    <script src="../src/scripts/utils/format-utils.js"></script>
-    <script src="../src/scripts/utils/modal-manager.js"></script>
-    <script src="../src/scripts/components/category-manager.js"></script>
-    <script src="../src/scripts/utils/auth-utils.js"></script>
+            <!-- Scripts -->
+            <script src="../src/scripts/utils/constants.js"></script>
+            <script src="../src/scripts/api/api-service.js"></script>
+            <script src="../src/scripts/api/category-api.js"></script>
+            <script src="../src/scripts/api/expense-api.js"></script>
+            <script src="../src/scripts/utils/modal-manager.js"></script>
+            <script src="../src/scripts/utils/format-utils.js"></script>
+            <script src="../src/scripts/components/category-manager.js"></script>
+            <script src="../src/scripts/components/expense-manager.js"></script>
+            <script src="../src/scripts/utils/auth-utils.js"></script>
 </body>
 
 </html>

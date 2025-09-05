@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('create-category-form').addEventListener('submit', handleCreateCategory);
   document.getElementById('update-category-form').addEventListener('submit', handleUpdateCategory);
   document.getElementById('expense-form').addEventListener('submit', handleAddExpense);
+  document.getElementById('update-expense-form').addEventListener('submit', handleUpdateExpense);
 
   // Close modals when clicking overlay
   document.querySelectorAll('.custom-alert-overlay').forEach(overlay => {

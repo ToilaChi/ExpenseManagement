@@ -22,4 +22,12 @@ function openExpenseModal(categoryId, categoryName) {
   openCustomAlert('expense-overlay');
 }
 
+function openUpdateExpenseModal(expenseId, categoryName, amount, description) {
+  document.getElementById('update-expense-id').value = expenseId;
+  document.getElementById('update-expense-category').value = categoryName;
+  document.getElementById('update-expense-amount').value = amount;
+  document.getElementById('update-expense-description').value = description;
+  document.getElementById('update-expense-modal-title').textContent = `Cập nhật chi tiêu - ${categoryName}`;
+  openCustomAlert('update-expense-overlay');
+}
 
