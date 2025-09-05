@@ -170,5 +170,47 @@ public class ExpenseController {
     }
   }
 
-  
+  @GetMapping("/chart-data/{filterType}")
+  public ResponseEntity<ExpenseSummaryResponse> getExpenseSummary(
+          @RequestHeader("Authorization") String authorizationHeader,
+          @PathVariable String filterType,
+          @RequestParam(defaultValue = "2025-01") String date) {
+
+    try {
+      String accessToken = getTokenFromHeader(authorizationHeader);
+      Users user = getCurrentUser(accessToken);
+
+      if (user == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ExpenseSummaryResponse(null, "User không tồn tại", null));
+      }
+
+      // Validate filterType
+      if (!filterType.matches("day|week|month")) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ExpenseSummaryResponse(null, "FilterType không hợp lệ. Chỉ chấp nhận: day, week, month", null));
+      }
+
+      // Get category summary for pie chart
+      List<ExpenseSummaryResponse.CategorySummary> categorySummaries =
+              expenseService.getExpenseSummary(user.getId(), filterType, date);
+
+      // Get overall stats
+      ExpenseSummaryResponse.SummaryStats summaryStats =
+              expenseService.getSummaryStats(user.getId(), filterType, date);
+
+      ExpenseSummaryResponse response = new ExpenseSummaryResponse(
+              categorySummaries,
+              "Lấy thống kê chi tiêu thành công",
+              summaryStats
+      );
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+              .body(new ExpenseSummaryResponse(null, "Lỗi: " + e.getMessage(), null));
+    }
+  }
+
 }

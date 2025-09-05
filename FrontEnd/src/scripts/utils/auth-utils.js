@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load initial data
   loadCategories();
 
+  // Initialize chart
+  initializeChart();
+  loadChartData();
+
   // Form event listeners
   document.getElementById('create-category-form').addEventListener('submit', handleCreateCategory);
   document.getElementById('update-category-form').addEventListener('submit', handleUpdateCategory);

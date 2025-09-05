@@ -86,34 +86,3 @@ function showExpenseLoading(show) {
   }
 }
 
-// Filter functions
-function setExpenseFilter(type) {
-  // Update UI
-  document.querySelectorAll('.filter-button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.querySelector(`[onclick="setExpenseFilter('${type}')"]`).classList.add('active');
-
-  // Update state
-  appState.currentFilter.type = type;
-  appState.currentFilter.page = 0; // Reset to first page
-
-  // Set default date based on filter type
-  const now = new Date();
-  switch (type) {
-    case 'day':
-      appState.currentFilter.date = now.toISOString().split('T')[0]; // YYYY-MM-DD
-      break;
-    case 'week':
-      // Get Monday of current week
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - now.getDay() + 1);
-      appState.currentFilter.date = monday.toISOString().split('T')[0];
-      break;
-    case 'month':
-      appState.currentFilter.date = now.toISOString().slice(0, 7); // YYYY-MM
-      break;
-  }
-
-  loadExpenses();
-}

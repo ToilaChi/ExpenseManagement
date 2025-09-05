@@ -691,3 +691,128 @@ tr:last-child td {
     background: var(--dynamic-color, #4CAF50);
     transition: width 0.3s ease;
 }
+
+/* Chart Section Styles */
+.chart-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-summary h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.chart-legend {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.legend-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.legend-item:hover {
+    background-color: #f5f5f5;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.legend-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.legend-category {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.legend-amount {
+    color: #666;
+    font-size: 13px;
+    margin: 2px 0;
+}
+
+.legend-count {
+    color: #999;
+    font-size: 12px;
+}
+
+.empty-chart-message {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Loading state */
+.chart-section.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.chart-section.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chart-section {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}

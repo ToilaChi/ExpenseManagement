@@ -109,4 +109,21 @@ class ExpenseAPI {
       throw error;
     }
   }
+
+  static async getChartData(filterType, date) {
+    const accessToken = localStorage.getItem('accessToken');
+    const response = await fetch(`${this.API_BASE_URL}/expenses/chart-data/${filterType}?date=${date}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    return await response.json();
+  }
 }

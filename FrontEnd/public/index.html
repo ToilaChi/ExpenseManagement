@@ -54,6 +54,17 @@
                         </div>
                     </div>
 
+                    <!-- Pie Chart -->
+                    <div class="chart-section">
+                        <div class="chart-container">
+                            <canvas id="expense-pie-chart" width="400" height="400"></canvas>
+                        </div>
+                        <div class="chart-summary">
+                            <h4>Chi tiêu tổng: <span id="total-expense-amount">0₫</span></h4>
+                            <div id="chart-legend" class="chart-legend"></div>
+                        </div>
+                    </div>
+
                     <!-- Expense Table -->
                     <div class="table-container">
                         <table id="expense-table">
@@ -169,14 +180,16 @@
             </div>
 
             <!-- Scripts -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="../src/scripts/utils/constants.js"></script>
             <script src="../src/scripts/api/api-service.js"></script>
             <script src="../src/scripts/api/category-api.js"></script>
             <script src="../src/scripts/api/expense-api.js"></script>
             <script src="../src/scripts/utils/modal-manager.js"></script>
             <script src="../src/scripts/utils/format-utils.js"></script>
-            <script src="../src/scripts/components/category-manager.js"></script>
+            <script src="../src/scripts/components/chart-manager.js"></script>
             <script src="../src/scripts/components/expense-manager.js"></script>
+            <script src="../src/scripts/components/category-manager.js"></script>
             <script src="../src/scripts/utils/auth-utils.js"></script>
 </body>
 
