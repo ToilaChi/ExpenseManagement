@@ -7,6 +7,7 @@
     <title>Trang Quản Lý Chi Tiêu</title>
     <link rel="stylesheet" href="../src/styles/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
@@ -48,9 +49,9 @@
 
                         <!-- Filter buttons -->
                         <div class="filter-container">
-                            <button class="filter-button active" onclick="setExpenseFilter('day')">NGÀY</button>
-                            <button class="filter-button" onclick="setExpenseFilter('week')">TUẦN</button>
-                            <button class="filter-button" onclick="setExpenseFilter('month')">THÁNG</button>
+                            <button class="filter-button active" data-filter="day" id="day-picker">NGÀY</button>
+                            <button class="filter-button" data-filter="week" id="week-picker">TUẦN</button>
+                            <button class="filter-button" data-filter="month" id="month-picker">THÁNG</button>
                         </div>
                     </div>
 
@@ -180,6 +181,8 @@
             </div>
 
             <!-- Scripts -->
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="../src/scripts/utils/constants.js"></script>
             <script src="../src/scripts/api/api-service.js"></script>

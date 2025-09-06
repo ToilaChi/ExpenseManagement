@@ -27,6 +27,9 @@ public class CategoryService {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private BudgetService budgetService;
+
   // Color pool
   private static final List<String> COLOR_POOL = Arrays.asList(
           "#4CAF50", // Xanh lá cho INCOME (default)

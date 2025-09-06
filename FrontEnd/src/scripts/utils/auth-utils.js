@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize chart
   initializeChart();
+  initializeDatePicker();
+  // setupFilterEvents();
+  setupFilterHoverEvents();
   loadChartData();
 
   // Form event listeners

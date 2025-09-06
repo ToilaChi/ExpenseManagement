@@ -269,6 +269,8 @@ body {
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 15px;
+    position: relative;
+    margin-right: 10px;
 }
 
 .filter-button {
@@ -279,14 +281,39 @@ body {
     color: #8e24aa;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.filter-button.active,
 .filter-button:hover {
-    background-color: #e1bee7;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.filter-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.25);
+}
+
+/* Flatpickr custom styling */
+.flatpickr-calendar {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-top: 5px;
+    /* margin-left: 20px; */
+}
+
+.flatpickr-day:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.flatpickr-day.selected {
+    background-color: #007bff;
+    border-color: #007bff;
 }
 
 .stats-body {
@@ -330,6 +357,12 @@ body {
     border-radius: 4px;
     margin-right: 10px;
     border: 1px solid #ccc;
+}
+
+.legend-label,
+.legend-value,
+.legend-percentage {
+    margin-right: 10px;
 }
 
 .table-container {
